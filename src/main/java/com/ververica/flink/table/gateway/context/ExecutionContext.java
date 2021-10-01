@@ -501,6 +501,8 @@ public class ExecutionContext<ClusterID> {
             tableEnv.registerCatalog(catalogName, catalog);
             tableEnv.useCatalog(catalogName);
 
+            LOG.info("kanwei here");
+
         } else if (environment.getExecution().isBatchPlanner()) {
             streamExecEnv = null;
             execEnv = createExecutionEnvironment();
