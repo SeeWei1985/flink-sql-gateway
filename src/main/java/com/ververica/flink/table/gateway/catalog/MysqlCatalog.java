@@ -12,7 +12,6 @@ import org.apache.flink.table.types.DataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.catalog.CatalogException;
 import java.sql.*;
 import java.util.*;
 
