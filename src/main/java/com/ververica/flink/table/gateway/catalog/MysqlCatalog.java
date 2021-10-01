@@ -48,7 +48,19 @@ public class MysqlCatalog extends AbstractCatalog {
 
     @Override
     public List<String> listDatabases() throws CatalogException {
-        return null;
+        List<String> res = new ArrayList<>();
+        res.add("default_database");
+//        try {
+//            PreparedStatement ps = connection.prepareStatement("select database_name from metadata_database");
+//            ResultSet rs = ps.executeQuery();
+//            while (rs.next()) {
+//
+//            }
+//        } catch (Exception e) {
+//            logger.error("list database fail", e);
+//        }
+
+        return res;
     }
 
     @Override
@@ -58,7 +70,10 @@ public class MysqlCatalog extends AbstractCatalog {
 
     @Override
     public List<String> listTables(String databaseName) throws DatabaseNotExistException, CatalogException {
-        return null;
+        List<String> res = new ArrayList<>();
+        res.add("sourceTable");
+        res.add("destinationTable");
+        return res;
     }
 
     @Override
