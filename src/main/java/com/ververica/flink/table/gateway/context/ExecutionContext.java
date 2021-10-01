@@ -491,7 +491,7 @@ public class ExecutionContext<ClusterID> {
             // register  catalog
             // kanwei
 
-            String catalogName = "yana-catalog";
+            String catalogName = "yana";
             String defaultDatabase = "default_database";
             String username = "root";
             String password = "Password01!";
@@ -499,7 +499,7 @@ public class ExecutionContext<ClusterID> {
 
             MysqlCatalog catalog = new MysqlCatalog(catalogName, defaultDatabase, username, password, jdbcUrl);
             tableEnv.registerCatalog(catalogName, catalog);
-            tableEnv.useCatalog(catalogName);
+            //tableEnv.useCatalog(catalogName);
 
             LOG.info("kanwei here");
 
