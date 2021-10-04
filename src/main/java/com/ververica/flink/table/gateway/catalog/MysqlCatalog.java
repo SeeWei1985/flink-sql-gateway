@@ -156,7 +156,7 @@ public class MysqlCatalog extends AbstractCatalog {
 
         //设置主键
         if (pk != null && !"".equals(pk)) {
-            builder.primaryKey(pk.split(";"));
+            builder.primaryKey(pk.split(","));
         }
         //设置watermark
         if (watermarkExpression != null && !"".equals(watermarkExpression)) {
