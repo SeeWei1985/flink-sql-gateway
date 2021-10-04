@@ -495,7 +495,7 @@ public class ExecutionContext<ClusterID> {
             String defaultDatabase = "default_database";
             String username = "root";
             String password = "Password01!";
-            String jdbcUrl = "jdbc:mysql://120.27.2.6:3306/flink_metastore?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC";
+            String jdbcUrl = "jdbc:mysql://120.27.2.6:3306/data-plat?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC";
 
             MysqlCatalog catalog = new MysqlCatalog(catalogName, defaultDatabase, username, password, jdbcUrl);
             tableEnv.registerCatalog(catalogName, catalog);
