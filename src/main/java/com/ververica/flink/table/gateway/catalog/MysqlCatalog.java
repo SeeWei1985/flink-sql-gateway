@@ -7,6 +7,7 @@ import org.apache.flink.table.catalog.exceptions.*;
 import org.apache.flink.table.catalog.stats.CatalogColumnStatistics;
 import org.apache.flink.table.catalog.stats.CatalogTableStatistics;
 import org.apache.flink.table.expressions.Expression;
+import org.apache.flink.table.expressions.In;
 import org.apache.flink.table.factories.Factory;
 import org.apache.flink.table.types.DataType;
 import org.slf4j.Logger;
@@ -139,11 +140,12 @@ public class MysqlCatalog extends AbstractCatalog {
                 }
                 String columnName = rs.getString("field_name");
                 String columnType = rs.getString("field_type");
-                String expr = rs.getString("field_size");
+                String columnSize = rs.getString("field_size");
+                String expr = rs.getString("expr");
                 if (expr == null || "".equals(expr)) {
-                    builder.field(columnName, mappingType(columnType));
+                    builder.field(columnName, mappingType(columnType, columnSize));
                 } else {
-                    builder.field(columnName, mappingType(columnType), expr);
+                    builder.field(columnName, mappingType(columnType, columnSize), expr);
                 }
             }
 
@@ -374,15 +376,27 @@ public class MysqlCatalog extends AbstractCatalog {
      * @param mysqlType
      * @return
      */
-    private DataType mappingType(String mysqlType) {
+    private DataType mappingType(String mysqlType, String columnSize) {
+        mysqlType = mysqlType.toLowerCase();
+
         switch (mysqlType) {
-            case MYSQL_TYPE_BIGINT:
+            case "bigint":
                 return DataTypes.BIGINT();
-            case MYSQL_TYPE_DOUBLE:
+            case "double":
                 return DataTypes.DOUBLE();
-            case MYSQL_TYPE_STRING:
+            case "string":
                 return DataTypes.STRING();
-            case MYSQL_TYPE_TIMESTAMP:
+            case "decimal": {
+                String[] tmp = columnSize.split(",");
+                return DataTypes.DECIMAL(Integer.parseInt(tmp[0]), Integer.parseInt(tmp[1]));
+            }
+            case "char": {
+                return DataTypes.CHAR(Integer.parseInt(columnSize));
+            }
+            case "boolean": {
+                return DataTypes.BOOLEAN();
+            }
+            case "timestamp":
                 return DataTypes.TIMESTAMP(3);
             default:
                 throw new UnsupportedOperationException("current not support " + mysqlType);
