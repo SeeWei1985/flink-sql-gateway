@@ -49,17 +49,19 @@ public class MysqlCatalog extends AbstractCatalog {
     @Override
     public List<String> listDatabases() throws CatalogException {
         List<String> res = new ArrayList<>();
-        res.add("default_database");
-//        try {
-//            PreparedStatement ps = connection.prepareStatement("select database_name from metadata_database");
-//            ResultSet rs = ps.executeQuery();
-//            while (rs.next()) {
-//
-//            }
-//        } catch (Exception e) {
-//            logger.error("list database fail", e);
-//        }
 
+        String sql = "select db_name from biz_meta_db";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                String db_name = rs.getString("db_name");
+                res.add(db_name);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return res;
     }
 
@@ -71,8 +73,25 @@ public class MysqlCatalog extends AbstractCatalog {
     @Override
     public List<String> listTables(String databaseName) throws DatabaseNotExistException, CatalogException {
         List<String> res = new ArrayList<>();
-        res.add("sourceTable");
-        res.add("destinationTable");
+        String sql = "SELECT\n" +
+                "\t tb.tb_name as tb_name\n" +
+                "FROM\n" +
+                "\tbiz_meta_db db\n" +
+                "\tjoin biz_meta_db_tb_rel rl on db.id=rl.db_id\n" +
+                "\tJOIN biz_meta_table tb ON rl.tb_id = tb.id \n" +
+                "WHERE db.db_name =? ";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, databaseName);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                String tb_name = rs.getString("tb_name");
+                res.add(tb_name);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return res;
     }
 
@@ -83,6 +102,7 @@ public class MysqlCatalog extends AbstractCatalog {
 
     @Override
     public CatalogBaseTable getTable(ObjectPath tablePath) throws TableNotExistException, CatalogException {
+
         TableSchema.Builder builder = TableSchema.builder();
         String databaseName = tablePath.getDatabaseName();
         String tableName = tablePath.getObjectName();
@@ -90,20 +110,36 @@ public class MysqlCatalog extends AbstractCatalog {
         String watermarkRowTimeAttribute = "";
         String watermarkExpression = "";
         try {
-            PreparedStatement ps = connection.prepareStatement("select tb.id, db.database_name, tb.tableName,tb.primaryKey, tb.watermarkRowTimeAttribute, tb.watermarkExpression, cl.columnName, cl.columnType, cl.expr FROM metadata_database db JOIN metadata_table tb ON db.id = tb.databaseId JOIN metadata_column cl ON tb.id = cl.tableId WHERE database_name =? AND tableName =?");
+            PreparedStatement ps = connection.prepareStatement("SELECT\n" +
+                    "\ttb.id,\n" +
+                    "\tdb.db_name,\n" +
+                    "\ttb.tb_name,\n" +
+                    "\ttb.primary_key,\n" +
+                    "\ttb.watermark_row_time_attribute,\n" +
+                    "\ttb.watermark_expression,\n" +
+                    "\tcl.field_name,\n" +
+                    "\tcl.field_type,\n" +
+                    "\tcl.field_size \n" +
+                    "FROM\n" +
+                    "\tbiz_meta_db db\n" +
+                    "\tjoin biz_meta_db_tb_rel rl on db.id=rl.db_id\n" +
+                    "\tJOIN biz_meta_table tb ON rl.tb_id = tb.id\n" +
+                    "\tJOIN biz_meta_field cl ON tb.id = cl.tb_id \n" +
+                    "WHERE db.db_name =?  \tAND tb.tb_name =? ");
+
             ps.setString(1, databaseName);
             ps.setString(2, tableName);
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 if (rs.isFirst()) {
-                    pk = rs.getString("primaryKey");
-                    watermarkRowTimeAttribute = rs.getString("watermarkRowTimeAttribute");
-                    watermarkExpression = rs.getString("watermarkExpression");
+                    pk = rs.getString("primary_key");
+                    watermarkRowTimeAttribute = rs.getString("watermark_row_time_attribute");
+                    watermarkExpression = rs.getString("watermark_expression");
                 }
-                String columnName = rs.getString("columnName");
-                String columnType = rs.getString("columnType");
-                String expr = rs.getString("expr");
+                String columnName = rs.getString("field_name");
+                String columnType = rs.getString("field_type");
+                String expr = rs.getString("field_size");
                 if (expr == null || "".equals(expr)) {
                     builder.field(columnName, mappingType(columnType));
                 } else {
@@ -267,7 +303,7 @@ public class MysqlCatalog extends AbstractCatalog {
     @Override
     public boolean databaseExists(String databaseName) throws CatalogException {
 
-        String sql = "select count(*) from metadata_database where database_name=?";
+        String sql = "select count(*) from biz_meta_db where db_name = ?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, databaseName);
@@ -307,7 +343,16 @@ public class MysqlCatalog extends AbstractCatalog {
     private Map<String, String> getPropertiesFromMysql(String databaseName, String tableName) {
         Map<String, String> map = new HashMap<>();
 
-        String sql = "select tp.`key`,tp.`value` from metadata_database db join metadata_table tb on db.id=tb.databaseId join metadata_table_properties tp on tp.tableId=tb.id where database_name=? and tableName=?";
+        String sql = "SELECT\n" +
+                "\tfl.field_key as `key`,\n" +
+                "  fl.choose_val as `value`\n" +
+                "\n" +
+                "FROM\n" +
+                "\tbiz_meta_db db\n" +
+                "\tjoin biz_meta_db_tb_rel rl on db.id=rl.db_id\n" +
+                "\tJOIN biz_meta_table tb ON rl.tb_id = tb.id\n" +
+                "\tJOIN biz_meta_table_field_rel fl ON tb.id = fl.tb_id \n" +
+                "WHERE db.db_name =?  \tAND tb.tb_name =?";
         try {
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setString(1, databaseName);
