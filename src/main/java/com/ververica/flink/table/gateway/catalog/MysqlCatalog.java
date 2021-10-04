@@ -121,6 +121,7 @@ public class MysqlCatalog extends AbstractCatalog {
                     "\tcl.field_name,\n" +
                     "\tcl.field_type,\n" +
                     "\tcl.field_size \n" +
+                    "\tcl.expr \n" +
                     "FROM\n" +
                     "\tbiz_meta_db db\n" +
                     "\tjoin biz_meta_db_tb_rel rl on db.id=rl.db_id\n" +
