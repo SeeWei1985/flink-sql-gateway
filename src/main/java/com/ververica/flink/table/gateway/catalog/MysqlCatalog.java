@@ -394,6 +394,9 @@ public class MysqlCatalog extends AbstractCatalog {
             case "char": {
                 return DataTypes.CHAR(Integer.parseInt(columnSize));
             }
+            case "varchar": {
+                return DataTypes.VARCHAR(Integer.parseInt(columnSize));
+            }
             case "boolean": {
                 return DataTypes.BOOLEAN();
             }
