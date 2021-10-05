@@ -91,14 +91,6 @@ public class Environment {
         return session;
     }
 
-    public YanaEntry getYana() {
-        return yana;
-    }
-
-    public void setYana(Map<String, Object> config) {
-        this.yana = YanaEntry.create(config);
-    }
-
     public void setServer(Map<String, Object> config) {
         this.server = ServerEntry.create(config);
     }
@@ -193,6 +185,14 @@ public class Environment {
 
     public ConfigurationEntry getConfiguration() {
         return configuration;
+    }
+
+    public void setYana(Map<String, Object> config) {
+        this.yana = YanaEntry.create(config);
+    }
+
+    public YanaEntry getYana() {
+        return yana;
     }
 
     public void setDeployment(Map<String, Object> config) {
