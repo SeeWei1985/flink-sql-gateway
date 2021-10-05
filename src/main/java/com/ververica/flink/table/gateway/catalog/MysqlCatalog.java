@@ -4,7 +4,6 @@ import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.*;
 import org.apache.flink.table.catalog.exceptions.*;
-import org.apache.flink.table.catalog.hive.HiveCatalog;
 import org.apache.flink.table.catalog.stats.CatalogColumnStatistics;
 import org.apache.flink.table.catalog.stats.CatalogTableStatistics;
 import org.apache.flink.table.expressions.Expression;
@@ -15,9 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.apache.flink.table.utils.PartitionPathUtils.unescapePathName;
 
 public class MysqlCatalog extends AbstractCatalog {
 
@@ -193,6 +189,8 @@ public class MysqlCatalog extends AbstractCatalog {
                     String.format("Failed to list partitions of table %s", tablePath), e);
 
         }
+
+        logger.warn("partiotn list = " + pList.size());
 
         return new CatalogTableImpl(schema, pList, getPropertiesFromMysql(databaseName, tableName), "").copy();
 
