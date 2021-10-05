@@ -4,10 +4,10 @@ import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.*;
 import org.apache.flink.table.catalog.exceptions.*;
+import org.apache.flink.table.catalog.hive.HiveCatalog;
 import org.apache.flink.table.catalog.stats.CatalogColumnStatistics;
 import org.apache.flink.table.catalog.stats.CatalogTableStatistics;
 import org.apache.flink.table.expressions.Expression;
-import org.apache.flink.table.expressions.In;
 import org.apache.flink.table.factories.Factory;
 import org.apache.flink.table.types.DataType;
 import org.slf4j.Logger;
@@ -15,16 +15,15 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.apache.flink.table.utils.PartitionPathUtils.unescapePathName;
 
 public class MysqlCatalog extends AbstractCatalog {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static final String MYSQL_CLASS = "com.mysql.jdbc.Driver";
-    public static final String MYSQL_TYPE_STRING = "string";
-    public static final String MYSQL_TYPE_DOUBLE = "double";
-    public static final String MYSQL_TYPE_TIMESTAMP = "timestamp";
-    public static final String MYSQL_TYPE_BIGINT = "bigint";
 
     private Connection connection;
 
@@ -158,13 +157,44 @@ public class MysqlCatalog extends AbstractCatalog {
         if (pk != null && !"".equals(pk)) {
             builder.primaryKey(pk.split(","));
         }
+
         //设置watermark
         if (watermarkExpression != null && !"".equals(watermarkExpression)) {
             builder.watermark(watermarkRowTimeAttribute, watermarkExpression, DataTypes.TIMESTAMP(3));
         }
 
         TableSchema schema = builder.build();
-        return new CatalogTableImpl(schema, getPropertiesFromMysql(databaseName, tableName), "").copy();
+
+
+        List<String> pList = new ArrayList<>();
+
+        String sql = "select a.* from (\n" +
+                "SELECT\n" +
+                "\tcl.field_name,cl.row_order\n" +
+                "FROM\n" +
+                "\tbiz_meta_db db\n" +
+                "\tjoin biz_meta_db_tb_rel rl on db.id=rl.db_id\n" +
+                "\tJOIN biz_meta_table tb ON rl.tb_id = tb.id\n" +
+                "\tJOIN biz_meta_field cl ON tb.id = cl.tb_id \n" +
+                "WHERE db.db_name =?  \tAND tb.tb_name =?  and cl.partition_flag=1 ) a order by a.row_order desc";
+
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, databaseName);
+            ps.setString(2, tableName);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                String columnName = rs.getString("field_name");
+                pList.add(columnName);
+            }
+        } catch (Exception e) {
+            throw new CatalogException(
+                    String.format("Failed to list partitions of table %s", tablePath), e);
+
+        }
+
+        return new CatalogTableImpl(schema, pList, getPropertiesFromMysql(databaseName, tableName), "").copy();
 
     }
 
@@ -196,7 +226,21 @@ public class MysqlCatalog extends AbstractCatalog {
     @Override
     public List<CatalogPartitionSpec> listPartitions(ObjectPath tablePath) throws TableNotExistException, TableNotPartitionedException, CatalogException {
         return null;
+
     }
+
+
+    private static CatalogPartitionSpec createPartitionSpec(String hivePartitionName) {
+//        String[] partKeyVals = hivePartitionName.split("/");
+//        Map<String, String> spec = new HashMap<>(partKeyVals.length);
+//        for (String keyVal : partKeyVals) {
+//            String[] kv = keyVal.split("=");
+//            spec.put(unescapePathName(kv[0]), unescapePathName(kv[1]));
+//        }
+//        return new CatalogPartitionSpec(spec);
+        return null;
+    }
+
 
     @Override
     public List<CatalogPartitionSpec> listPartitions(ObjectPath tablePath, CatalogPartitionSpec partitionSpec) throws TableNotExistException, TableNotPartitionedException, CatalogException {
