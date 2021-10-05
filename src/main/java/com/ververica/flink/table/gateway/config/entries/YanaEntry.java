@@ -1,104 +1,72 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.ververica.flink.table.gateway.config.entries;
 
 import com.ververica.flink.table.gateway.config.ConfigUtil;
 import org.apache.flink.table.descriptors.DescriptorProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
-import static com.ververica.flink.table.gateway.config.Environment.YANA_ENTRY;
+import static com.ververica.flink.table.gateway.config.Environment.DEPLOYMENT_ENTRY;
 
-/**
- * Describes a catalog configuration entry.
- */
+
 public class YanaEntry extends ConfigEntry {
 
-    public static final YanaEntry DEFAULT_INSTANCE = new YanaEntry(
-            "data-plat",
-            "root",
-            "root",
-            "jdbc:mysql://localhost:3306/data-plat?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC",
-            new DescriptorProperties(true)
-    );
+    private static final Logger LOG = LoggerFactory.getLogger(YanaEntry.class);
 
-    public static final String YANA_NAME = "yana";
+    public static final YanaEntry DEFAULT_INSTANCE =
+            new YanaEntry(new DescriptorProperties(true));
 
-    private final String defaultDatabase;
-    private final String username;
-    private final String pwd;
-    private final String connectUrl;
+    private static final String defaultDatabase = "defaultDatabase";
+    private static final String username = "username";
+    private static final String pwd = "pwd";
+    private static final String connectUrl = "connectUrl";
 
-    protected YanaEntry(String defaultDatabase, String username, String pwd, String connectUrl, DescriptorProperties properties) {
+    private YanaEntry(DescriptorProperties properties) {
         super(properties);
-        this.defaultDatabase = defaultDatabase;
-        this.username = username;
-        this.pwd = pwd;
-        this.connectUrl = connectUrl;
-    }
-
-    public String getDefaultDatabase() {
-        return defaultDatabase;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPwd() {
-        return pwd;
-    }
-
-    public String getConnectUrl() {
-        return connectUrl;
     }
 
     @Override
     protected void validate(DescriptorProperties properties) {
-        //properties.validateString(CATALOG_TYPE, false, 1);
-        //properties.validateInt(CATALOG_PROPERTY_VERSION, true, 0);
-
-        // further validation is performed by the discovered factory
+        properties.validateLong(defaultDatabase, false);
+        properties.validateString(username, false);
+        properties.validateInt(pwd, false);
+        properties.validateInt(connectUrl, false);
     }
 
-    public static YanaEntry create(Map<String, Object> config) {
-        return create(ConfigUtil.normalizeYaml(config));
+    public String getDefaultDatabase() {
+        return properties.getOptionalString(defaultDatabase).orElseGet(() -> useDefaultValue(defaultDatabase, "data-plat"));
+    }
+
+    public String getUsername() {
+        return properties.getOptionalString(username).orElseGet(() -> useDefaultValue(username, "root"));
+    }
+
+    public String getPwd() {
+        return properties.getOptionalString(pwd).orElseGet(() -> useDefaultValue(pwd, "root"));
+    }
+
+    public String getConnectUrl() {
+        return properties.getOptionalString(connectUrl).orElseGet(() -> useDefaultValue(connectUrl, "jdbc:mysql://localhost:3306/data-plat?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC"));
+    }
+
+
+    private <V> V useDefaultValue(String key, V defaultValue) {
+        LOG.info("Property '{}.{}' not specified. Using default value: {}", DEPLOYMENT_ENTRY, key, defaultValue);
+        return defaultValue;
     }
 
     public Map<String, String> asTopLevelMap() {
-        return properties.asPrefixedMap(YANA_ENTRY + '.');
+        return properties.asPrefixedMap(DEPLOYMENT_ENTRY + '.');
     }
 
-    private static YanaEntry create(DescriptorProperties properties) {
 
+    public static YanaEntry create(Map<String, Object> config) {
+        return new YanaEntry(ConfigUtil.normalizeYaml(config));
+    }
 
-        // properties.validateString(CATALOG_NAME, false, 1);
-
-        final String defaultDatabase = properties.getString("defaultDatabase");
-        final String username = properties.getString("username");
-        final String pwd = properties.getString("pwd");
-        final String connectUrl = properties.getString("connectUrl");
-
-        final DescriptorProperties cleanedProperties =
-                properties.withoutKeys(Collections.singletonList(YANA_NAME));
-
-        return new YanaEntry(defaultDatabase, username, pwd, connectUrl, cleanedProperties);
+    @Override
+    public String toString() {
+        return "YanaEntry{" + "properties=" + properties + '}';
     }
 }
