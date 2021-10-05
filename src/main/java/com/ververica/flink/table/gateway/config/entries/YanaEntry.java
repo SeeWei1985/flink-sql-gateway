@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-import static com.ververica.flink.table.gateway.config.Environment.DEPLOYMENT_ENTRY;
+import static com.ververica.flink.table.gateway.config.Environment.YANA_ENTRY;
 
 
 public class YanaEntry extends ConfigEntry {
@@ -52,12 +52,12 @@ public class YanaEntry extends ConfigEntry {
 
 
     private <V> V useDefaultValue(String key, V defaultValue) {
-        LOG.info("Property '{}.{}' not specified. Using default value: {}", DEPLOYMENT_ENTRY, key, defaultValue);
+        LOG.info("Property '{}.{}' not specified. Using default value: {}", YANA_ENTRY, key, defaultValue);
         return defaultValue;
     }
 
     public Map<String, String> asTopLevelMap() {
-        return properties.asPrefixedMap(DEPLOYMENT_ENTRY + '.');
+        return properties.asPrefixedMap(YANA_ENTRY + '.');
     }
 
 
