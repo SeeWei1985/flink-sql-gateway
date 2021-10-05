@@ -126,7 +126,7 @@ public class MysqlCatalog extends AbstractCatalog {
                     "\tjoin biz_meta_db_tb_rel rl on db.id=rl.db_id\n" +
                     "\tJOIN biz_meta_table tb ON rl.tb_id = tb.id\n" +
                     "\tJOIN biz_meta_field cl ON tb.id = cl.tb_id \n" +
-                    "WHERE db.db_name =?  \tAND tb.tb_name =?");
+                    "WHERE db.db_name =?  \tAND tb.tb_name =? and  cl.partition_flag=0");
 
             ps.setString(1, databaseName);
             ps.setString(2, tableName);
