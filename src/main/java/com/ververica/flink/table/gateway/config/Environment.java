@@ -80,7 +80,7 @@ public class Environment {
         this.execution = ExecutionEntry.DEFAULT_INSTANCE;
         this.configuration = ConfigurationEntry.DEFAULT_INSTANCE;
         this.deployment = DeploymentEntry.DEFAULT_INSTANCE;
-        //this.yana = YanaEntry.DEFAULT_INSTANCE;
+        this.yana = YanaEntry.DEFAULT_INSTANCE;
     }
 
     public void setSession(Map<String, Object> config) {
