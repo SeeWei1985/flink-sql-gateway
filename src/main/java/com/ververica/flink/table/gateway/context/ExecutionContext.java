@@ -18,15 +18,9 @@
 
 package com.ververica.flink.table.gateway.context;
 
-import com.ververica.flink.table.gateway.catalog.MysqlCatalog;
+import com.ververica.flink.table.gateway.catalog.YanaCatalog;
 import com.ververica.flink.table.gateway.config.Environment;
-import com.ververica.flink.table.gateway.config.entries.DeploymentEntry;
-import com.ververica.flink.table.gateway.config.entries.ExecutionEntry;
-import com.ververica.flink.table.gateway.config.entries.SinkTableEntry;
-import com.ververica.flink.table.gateway.config.entries.SourceSinkTableEntry;
-import com.ververica.flink.table.gateway.config.entries.SourceTableEntry;
-import com.ververica.flink.table.gateway.config.entries.TemporalTableEntry;
-import com.ververica.flink.table.gateway.config.entries.ViewEntry;
+import com.ververica.flink.table.gateway.config.entries.*;
 import com.ververica.flink.table.gateway.utils.SqlExecutionException;
 
 import org.apache.flink.api.common.ExecutionConfig;
@@ -490,15 +484,15 @@ public class ExecutionContext<ClusterID> {
                     functionCatalog);
             // register  catalog
             // kanwei
+            YanaEntry yana = this.environment.getYana();
+//            String catalogName = "yana";
+//            String defaultDatabase = "default_database";
+//            String username = "root";
+//            String password = "Password01!";
+//            String jdbcUrl = "jdbc:mysql://120.27.2.6:3306/data-plat?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC";
 
-            String catalogName = "yana";
-            String defaultDatabase = "default_database";
-            String username = "root";
-            String password = "Password01!";
-            String jdbcUrl = "jdbc:mysql://120.27.2.6:3306/data-plat?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC";
-
-            MysqlCatalog catalog = new MysqlCatalog(catalogName, defaultDatabase, username, password, jdbcUrl);
-            tableEnv.registerCatalog(catalogName, catalog);
+            YanaCatalog catalog = new YanaCatalog("yana", yana.getDefaultDatabase(), yana.getUsername(), yana.getPwd(), yana.getConnectUrl());
+            tableEnv.registerCatalog("yana", catalog);
             //tableEnv.useCatalog(catalogName);
 
             LOG.info("kanwei here");

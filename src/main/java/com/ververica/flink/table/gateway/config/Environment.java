@@ -18,16 +18,7 @@
 
 package com.ververica.flink.table.gateway.config;
 
-import com.ververica.flink.table.gateway.config.entries.CatalogEntry;
-import com.ververica.flink.table.gateway.config.entries.ConfigurationEntry;
-import com.ververica.flink.table.gateway.config.entries.DeploymentEntry;
-import com.ververica.flink.table.gateway.config.entries.ExecutionEntry;
-import com.ververica.flink.table.gateway.config.entries.FunctionEntry;
-import com.ververica.flink.table.gateway.config.entries.ModuleEntry;
-import com.ververica.flink.table.gateway.config.entries.ServerEntry;
-import com.ververica.flink.table.gateway.config.entries.SessionEntry;
-import com.ververica.flink.table.gateway.config.entries.TableEntry;
-import com.ververica.flink.table.gateway.config.entries.ViewEntry;
+import com.ververica.flink.table.gateway.config.entries.*;
 import com.ververica.flink.table.gateway.utils.SqlGatewayException;
 
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.JsonMappingException;
@@ -47,302 +38,317 @@ import java.util.Map;
  */
 public class Environment {
 
-	public static final String SERVER_ENTRY = "server";
+    public static final String SERVER_ENTRY = "server";
 
-	public static final String SESSION_ENTRY = "session";
+    public static final String SESSION_ENTRY = "session";
 
-	public static final String EXECUTION_ENTRY = "execution";
+    public static final String EXECUTION_ENTRY = "execution";
 
-	public static final String CONFIGURATION_ENTRY = "table";
+    public static final String CONFIGURATION_ENTRY = "table";
 
-	public static final String DEPLOYMENT_ENTRY = "deployment";
+    public static final String DEPLOYMENT_ENTRY = "deployment";
 
-	private ServerEntry server;
+    public static final String YANA_ENTRY = "yana";
 
-	private SessionEntry session;
+    private ServerEntry server;
 
-	private Map<String, ModuleEntry> modules;
+    private SessionEntry session;
 
-	private Map<String, CatalogEntry> catalogs;
+    private Map<String, ModuleEntry> modules;
 
-	private Map<String, TableEntry> tables;
+    private Map<String, CatalogEntry> catalogs;
 
-	private Map<String, FunctionEntry> functions;
+    private Map<String, TableEntry> tables;
 
-	private ExecutionEntry execution;
+    private Map<String, FunctionEntry> functions;
 
-	private ConfigurationEntry configuration;
+    private ExecutionEntry execution;
 
-	private DeploymentEntry deployment;
+    private ConfigurationEntry configuration;
 
-	public Environment() {
-		this.server = ServerEntry.DEFAULT_INSTANCE;
-		this.session = SessionEntry.DEFAULT_INSTANCE;
-		this.modules = new LinkedHashMap<>();
-		this.catalogs = Collections.emptyMap();
-		this.tables = Collections.emptyMap();
-		this.functions = Collections.emptyMap();
-		this.execution = ExecutionEntry.DEFAULT_INSTANCE;
-		this.configuration = ConfigurationEntry.DEFAULT_INSTANCE;
-		this.deployment = DeploymentEntry.DEFAULT_INSTANCE;
-	}
+    private DeploymentEntry deployment;
 
-	public void setSession(Map<String, Object> config) {
-		this.session = SessionEntry.create(config);
-	}
+    private YanaEntry yana;
 
-	public SessionEntry getSession() {
-		return session;
-	}
+    public Environment() {
+        this.server = ServerEntry.DEFAULT_INSTANCE;
+        this.session = SessionEntry.DEFAULT_INSTANCE;
+        this.modules = new LinkedHashMap<>();
+        this.catalogs = Collections.emptyMap();
+        this.tables = Collections.emptyMap();
+        this.functions = Collections.emptyMap();
+        this.execution = ExecutionEntry.DEFAULT_INSTANCE;
+        this.configuration = ConfigurationEntry.DEFAULT_INSTANCE;
+        this.deployment = DeploymentEntry.DEFAULT_INSTANCE;
+        this.yana = YanaEntry.DEFAULT_INSTANCE;
+    }
 
-	public void setServer(Map<String, Object> config) {
-		this.server = ServerEntry.create(config);
-	}
+    public void setSession(Map<String, Object> config) {
+        this.session = SessionEntry.create(config);
+    }
 
-	public ServerEntry getServer() {
-		return server;
-	}
+    public SessionEntry getSession() {
+        return session;
+    }
 
-	public Map<String, ModuleEntry> getModules() {
-		return modules;
-	}
+    public YanaEntry getYana() {
+        return yana;
+    }
 
-	public void setModules(List<Map<String, Object>> modules) {
-		this.modules = new LinkedHashMap<>(modules.size());
+    public void setYana(Map<String, Object> config) {
+        this.yana = YanaEntry.create(config);
+    }
 
-		modules.forEach(config -> {
-			final ModuleEntry entry = ModuleEntry.create(config);
-			if (this.modules.containsKey(entry.getName())) {
-				throw new SqlGatewayException(
-					String.format("Cannot register module '%s' because a module with this name is already registered.",
-						entry.getName()));
-			}
-			this.modules.put(entry.getName(), entry);
-		});
-	}
+    public void setServer(Map<String, Object> config) {
+        this.server = ServerEntry.create(config);
+    }
 
-	public Map<String, CatalogEntry> getCatalogs() {
-		return catalogs;
-	}
+    public ServerEntry getServer() {
+        return server;
+    }
 
-	public void setCatalogs(List<Map<String, Object>> catalogs) {
-		this.catalogs = new HashMap<>(catalogs.size());
+    public Map<String, ModuleEntry> getModules() {
+        return modules;
+    }
 
-		catalogs.forEach(config -> {
-			final CatalogEntry catalog = CatalogEntry.create(config);
-			if (this.catalogs.containsKey(catalog.getName())) {
-				throw new SqlGatewayException(
-					String.format("Cannot create catalog '%s' because a catalog with this name is already registered.",
-						catalog.getName()));
-			}
-			this.catalogs.put(catalog.getName(), catalog);
-		});
-	}
+    public void setModules(List<Map<String, Object>> modules) {
+        this.modules = new LinkedHashMap<>(modules.size());
 
-	public Map<String, TableEntry> getTables() {
-		return tables;
-	}
+        modules.forEach(config -> {
+            final ModuleEntry entry = ModuleEntry.create(config);
+            if (this.modules.containsKey(entry.getName())) {
+                throw new SqlGatewayException(
+                        String.format("Cannot register module '%s' because a module with this name is already registered.",
+                                entry.getName()));
+            }
+            this.modules.put(entry.getName(), entry);
+        });
+    }
 
-	public void setTables(List<Map<String, Object>> tables) {
-		this.tables = new LinkedHashMap<>(tables.size());
+    public Map<String, CatalogEntry> getCatalogs() {
+        return catalogs;
+    }
 
-		tables.forEach(config -> {
-			final TableEntry table = TableEntry.create(config);
-			if (this.tables.containsKey(table.getName())) {
-				throw new SqlGatewayException(
-					"Cannot create table '" + table
-						.getName() + "' because a table with this name is already registered.");
-			}
-			this.tables.put(table.getName(), table);
-		});
-	}
+    public void setCatalogs(List<Map<String, Object>> catalogs) {
+        this.catalogs = new HashMap<>(catalogs.size());
 
-	public Map<String, FunctionEntry> getFunctions() {
-		return functions;
-	}
+        catalogs.forEach(config -> {
+            final CatalogEntry catalog = CatalogEntry.create(config);
+            if (this.catalogs.containsKey(catalog.getName())) {
+                throw new SqlGatewayException(
+                        String.format("Cannot create catalog '%s' because a catalog with this name is already registered.",
+                                catalog.getName()));
+            }
+            this.catalogs.put(catalog.getName(), catalog);
+        });
+    }
 
-	public void setFunctions(List<Map<String, Object>> functions) {
-		this.functions = new HashMap<>(functions.size());
+    public Map<String, TableEntry> getTables() {
+        return tables;
+    }
 
-		functions.forEach(config -> {
-			final FunctionEntry function = FunctionEntry.create(config);
-			if (this.functions.containsKey(function.getName())) {
-				throw new SqlGatewayException(
-					"Cannot create function '" + function
-						.getName() + "' because a function with this name is already registered.");
-			}
-			this.functions.put(function.getName(), function);
-		});
-	}
+    public void setTables(List<Map<String, Object>> tables) {
+        this.tables = new LinkedHashMap<>(tables.size());
 
-	public void setExecution(Map<String, Object> config) {
-		this.execution = ExecutionEntry.create(config);
-	}
+        tables.forEach(config -> {
+            final TableEntry table = TableEntry.create(config);
+            if (this.tables.containsKey(table.getName())) {
+                throw new SqlGatewayException(
+                        "Cannot create table '" + table
+                                .getName() + "' because a table with this name is already registered.");
+            }
+            this.tables.put(table.getName(), table);
+        });
+    }
 
-	public ExecutionEntry getExecution() {
-		return execution;
-	}
+    public Map<String, FunctionEntry> getFunctions() {
+        return functions;
+    }
 
-	public void setConfiguration(Map<String, Object> config) {
-		this.configuration = ConfigurationEntry.create(config);
-	}
+    public void setFunctions(List<Map<String, Object>> functions) {
+        this.functions = new HashMap<>(functions.size());
 
-	public ConfigurationEntry getConfiguration() {
-		return configuration;
-	}
+        functions.forEach(config -> {
+            final FunctionEntry function = FunctionEntry.create(config);
+            if (this.functions.containsKey(function.getName())) {
+                throw new SqlGatewayException(
+                        "Cannot create function '" + function
+                                .getName() + "' because a function with this name is already registered.");
+            }
+            this.functions.put(function.getName(), function);
+        });
+    }
 
-	public void setDeployment(Map<String, Object> config) {
-		this.deployment = DeploymentEntry.create(config);
-	}
+    public void setExecution(Map<String, Object> config) {
+        this.execution = ExecutionEntry.create(config);
+    }
 
-	public DeploymentEntry getDeployment() {
-		return deployment;
-	}
+    public ExecutionEntry getExecution() {
+        return execution;
+    }
 
-	@Override
-	public String toString() {
-		final StringBuilder sb = new StringBuilder();
-		sb.append("==================== Server =====================\n");
-		server.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
-		sb.append("==================== Session =====================\n");
-		session.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
-		sb.append("===================== Modules =====================\n");
-		modules.forEach((name, module) -> {
-			sb.append("- ").append(ModuleEntry.MODULE_NAME).append(": ").append(name).append("\n");
-			module.asMap().forEach((k, v) -> sb.append("  ").append(k).append(": ").append(v).append('\n'));
-		});
-		sb.append("===================== Catalogs =====================\n");
-		catalogs.forEach((name, catalog) -> {
-			sb.append("- ").append(CatalogEntry.CATALOG_NAME).append(": ").append(name).append("\n");
-			catalog.asMap().forEach((k, v) -> sb.append("  ").append(k).append(": ").append(v).append('\n'));
-		});
-		sb.append("===================== Tables =====================\n");
-		tables.forEach((name, table) -> {
-			sb.append("- ").append(TableEntry.TABLES_NAME).append(": ").append(name).append("\n");
-			table.asMap().forEach((k, v) -> sb.append("  ").append(k).append(": ").append(v).append('\n'));
-		});
-		sb.append("=================== Functions ====================\n");
-		functions.forEach((name, function) -> {
-			sb.append("- ").append(FunctionEntry.FUNCTIONS_NAME).append(": ").append(name).append("\n");
-			function.asMap().forEach((k, v) -> sb.append("  ").append(k).append(": ").append(v).append('\n'));
-		});
-		sb.append("=================== Execution ====================\n");
-		execution.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
-		sb.append("================== Configuration =================\n");
-		configuration.asMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
-		sb.append("=================== Deployment ===================\n");
-		deployment.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
-		return sb.toString();
-	}
+    public void setConfiguration(Map<String, Object> config) {
+        this.configuration = ConfigurationEntry.create(config);
+    }
 
-	// --------------------------------------------------------------------------------------------
+    public ConfigurationEntry getConfiguration() {
+        return configuration;
+    }
 
-	/**
-	 * Parses an environment file from an URL.
-	 */
-	public static Environment parse(URL url) throws IOException {
-		try {
-			return new ConfigUtil.LowerCaseYamlMapper().readValue(url, Environment.class);
-		} catch (JsonMappingException e) {
-			throw new SqlGatewayException("Could not parse environment file. Cause: " + e.getMessage());
-		}
-	}
+    public void setDeployment(Map<String, Object> config) {
+        this.deployment = DeploymentEntry.create(config);
+    }
 
-	/**
-	 * Parses an environment file from an String.
-	 */
-	public static Environment parse(String content) throws IOException {
-		try {
-			return new ConfigUtil.LowerCaseYamlMapper().readValue(content, Environment.class);
-		} catch (JsonMappingException e) {
-			throw new SqlGatewayException("Could not parse environment file. Cause: " + e.getMessage());
-		}
-	}
+    public DeploymentEntry getDeployment() {
+        return deployment;
+    }
 
-	/**
-	 * Merges two environments. The properties of the first environment might be overwritten by the second one.
-	 */
-	public static Environment merge(Environment env1, Environment env2) {
-		final Environment mergedEnv = new Environment();
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("==================== Server =====================\n");
+        server.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
+        sb.append("==================== Session =====================\n");
+        session.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
+        sb.append("===================== Modules =====================\n");
+        modules.forEach((name, module) -> {
+            sb.append("- ").append(ModuleEntry.MODULE_NAME).append(": ").append(name).append("\n");
+            module.asMap().forEach((k, v) -> sb.append("  ").append(k).append(": ").append(v).append('\n'));
+        });
+        sb.append("===================== Catalogs =====================\n");
+        catalogs.forEach((name, catalog) -> {
+            sb.append("- ").append(CatalogEntry.CATALOG_NAME).append(": ").append(name).append("\n");
+            catalog.asMap().forEach((k, v) -> sb.append("  ").append(k).append(": ").append(v).append('\n'));
+        });
+        sb.append("===================== Tables =====================\n");
+        tables.forEach((name, table) -> {
+            sb.append("- ").append(TableEntry.TABLES_NAME).append(": ").append(name).append("\n");
+            table.asMap().forEach((k, v) -> sb.append("  ").append(k).append(": ").append(v).append('\n'));
+        });
+        sb.append("=================== Functions ====================\n");
+        functions.forEach((name, function) -> {
+            sb.append("- ").append(FunctionEntry.FUNCTIONS_NAME).append(": ").append(name).append("\n");
+            function.asMap().forEach((k, v) -> sb.append("  ").append(k).append(": ").append(v).append('\n'));
+        });
+        sb.append("=================== Execution ====================\n");
+        execution.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
+        sb.append("================== Configuration =================\n");
+        configuration.asMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
+        sb.append("=================== Deployment ===================\n");
+        deployment.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
+        sb.append("=================== Yana ===================\n");
+        yana.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
+        return sb.toString();
+    }
 
-		// merge server properties
-		mergedEnv.server = ServerEntry.merge(env1.getServer(), env2.getServer());
+    // --------------------------------------------------------------------------------------------
 
-		// merge session properties
-		mergedEnv.session = SessionEntry.merge(env1.getSession(), env2.getSession());
+    /**
+     * Parses an environment file from an URL.
+     */
+    public static Environment parse(URL url) throws IOException {
+        try {
+            return new ConfigUtil.LowerCaseYamlMapper().readValue(url, Environment.class);
+        } catch (JsonMappingException e) {
+            throw new SqlGatewayException("Could not parse environment file. Cause: " + e.getMessage());
+        }
+    }
 
-		// merge modules
-		final Map<String, ModuleEntry> modules = new LinkedHashMap<>(env1.getModules());
-		modules.putAll(env2.getModules());
-		mergedEnv.modules = modules;
+    /**
+     * Parses an environment file from an String.
+     */
+    public static Environment parse(String content) throws IOException {
+        try {
+            return new ConfigUtil.LowerCaseYamlMapper().readValue(content, Environment.class);
+        } catch (JsonMappingException e) {
+            throw new SqlGatewayException("Could not parse environment file. Cause: " + e.getMessage());
+        }
+    }
 
-		// merge catalogs
-		final Map<String, CatalogEntry> catalogs = new HashMap<>(env1.getCatalogs());
-		catalogs.putAll(env2.getCatalogs());
-		mergedEnv.catalogs = catalogs;
+    /**
+     * Merges two environments. The properties of the first environment might be overwritten by the second one.
+     */
+    public static Environment merge(Environment env1, Environment env2) {
+        final Environment mergedEnv = new Environment();
 
-		// merge tables
-		final Map<String, TableEntry> tables = new LinkedHashMap<>(env1.getTables());
-		tables.putAll(env2.getTables());
-		mergedEnv.tables = tables;
+        // merge server properties
+        mergedEnv.server = ServerEntry.merge(env1.getServer(), env2.getServer());
 
-		// merge functions
-		final Map<String, FunctionEntry> functions = new HashMap<>(env1.getFunctions());
-		functions.putAll(env2.getFunctions());
-		mergedEnv.functions = functions;
+        // merge session properties
+        mergedEnv.session = SessionEntry.merge(env1.getSession(), env2.getSession());
 
-		// merge execution properties
-		mergedEnv.execution = ExecutionEntry.merge(env1.getExecution(), env2.getExecution());
+        // merge modules
+        final Map<String, ModuleEntry> modules = new LinkedHashMap<>(env1.getModules());
+        modules.putAll(env2.getModules());
+        mergedEnv.modules = modules;
 
-		// merge configuration properties
-		mergedEnv.configuration = ConfigurationEntry.merge(env1.getConfiguration(), env2.getConfiguration());
+        // merge catalogs
+        final Map<String, CatalogEntry> catalogs = new HashMap<>(env1.getCatalogs());
+        catalogs.putAll(env2.getCatalogs());
+        mergedEnv.catalogs = catalogs;
 
-		// merge deployment properties
-		mergedEnv.deployment = DeploymentEntry.merge(env1.getDeployment(), env2.getDeployment());
+        // merge tables
+        final Map<String, TableEntry> tables = new LinkedHashMap<>(env1.getTables());
+        tables.putAll(env2.getTables());
+        mergedEnv.tables = tables;
 
-		return mergedEnv;
-	}
+        // merge functions
+        final Map<String, FunctionEntry> functions = new HashMap<>(env1.getFunctions());
+        functions.putAll(env2.getFunctions());
+        mergedEnv.functions = functions;
 
-	public Environment clone() {
-		return enrich(this, Collections.emptyMap(), Collections.emptyMap());
-	}
+        // merge execution properties
+        mergedEnv.execution = ExecutionEntry.merge(env1.getExecution(), env2.getExecution());
 
-	/**
-	 * Enriches an environment with new/modified properties or views and returns the new instance.
-	 */
-	public static Environment enrich(
-		Environment env,
-		Map<String, String> properties,
-		Map<String, ViewEntry> views) {
-		final Environment enrichedEnv = new Environment();
+        // merge configuration properties
+        mergedEnv.configuration = ConfigurationEntry.merge(env1.getConfiguration(), env2.getConfiguration());
 
-		enrichedEnv.modules = new LinkedHashMap<>(env.getModules());
+        // merge deployment properties
+        mergedEnv.deployment = DeploymentEntry.merge(env1.getDeployment(), env2.getDeployment());
 
-		// merge catalogs
-		enrichedEnv.catalogs = new LinkedHashMap<>(env.getCatalogs());
+        return mergedEnv;
+    }
 
-		// merge tables
-		enrichedEnv.tables = new LinkedHashMap<>(env.getTables());
-		enrichedEnv.tables.putAll(views);
+    public Environment clone() {
+        return enrich(this, Collections.emptyMap(), Collections.emptyMap());
+    }
 
-		// merge functions
-		enrichedEnv.functions = new HashMap<>(env.getFunctions());
+    /**
+     * Enriches an environment with new/modified properties or views and returns the new instance.
+     */
+    public static Environment enrich(
+            Environment env,
+            Map<String, String> properties,
+            Map<String, ViewEntry> views) {
+        final Environment enrichedEnv = new Environment();
 
-		// enrich execution properties
-		enrichedEnv.execution = ExecutionEntry.enrich(env.execution, properties);
+        enrichedEnv.modules = new LinkedHashMap<>(env.getModules());
 
-		// enrich configuration properties
-		enrichedEnv.configuration = ConfigurationEntry.enrich(env.configuration, properties);
+        // merge catalogs
+        enrichedEnv.catalogs = new LinkedHashMap<>(env.getCatalogs());
 
-		// enrich deployment properties
-		enrichedEnv.deployment = DeploymentEntry.enrich(env.deployment, properties);
+        // merge tables
+        enrichedEnv.tables = new LinkedHashMap<>(env.getTables());
+        enrichedEnv.tables.putAll(views);
 
-		// does not change session properties
-		enrichedEnv.session = env.getSession();
+        // merge functions
+        enrichedEnv.functions = new HashMap<>(env.getFunctions());
 
-		// does not change server properties
-		enrichedEnv.server = env.getServer();
+        // enrich execution properties
+        enrichedEnv.execution = ExecutionEntry.enrich(env.execution, properties);
 
-		return enrichedEnv;
-	}
+        // enrich configuration properties
+        enrichedEnv.configuration = ConfigurationEntry.enrich(env.configuration, properties);
+
+        // enrich deployment properties
+        enrichedEnv.deployment = DeploymentEntry.enrich(env.deployment, properties);
+
+        // does not change session properties
+        enrichedEnv.session = env.getSession();
+
+        // does not change server properties
+        enrichedEnv.server = env.getServer();
+
+        return enrichedEnv;
+    }
 }

@@ -165,3 +165,10 @@ deployment:
 #==============================================================================
 
 # Properties that describe the cluster to which table programs are submitted to.
+
+
+yana:
+  defaultDatabase: "yana"
+  username: "root"
+  pwd: "Password01!"
+  connectUrl: "jdbc:mysql://120.27.2.6:3306/data-plat?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC"

@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.*;
 
-public class MysqlCatalog extends AbstractCatalog {
+public class YanaCatalog extends AbstractCatalog {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -23,7 +23,7 @@ public class MysqlCatalog extends AbstractCatalog {
 
     private Connection connection;
 
-    public MysqlCatalog(String catalogName, String defaultDatabase, String username, String pwd, String connectUrl) {
+    public YanaCatalog(String catalogName, String defaultDatabase, String username, String pwd, String connectUrl) {
         super(catalogName, defaultDatabase);
         try {
             Class.forName(MYSQL_CLASS);
