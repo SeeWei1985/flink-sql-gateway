@@ -187,9 +187,9 @@ public class Environment {
         return configuration;
     }
 
-//    public void setYana(Map<String, Object> config) {
-//        this.yana = YanaEntry.create(config);
-//    }
+    public void setYana(Map<String, Object> config) {
+        this.yana = YanaEntry.create(config);
+    }
 
     public YanaEntry getYana() {
         return yana;
