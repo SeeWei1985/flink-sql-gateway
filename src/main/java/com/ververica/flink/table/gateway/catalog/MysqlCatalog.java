@@ -189,7 +189,8 @@ public class MysqlCatalog extends AbstractCatalog {
                     String.format("Failed to list partitions of table %s", tablePath), e);
 
         }
-        return new CatalogTableImpl(schema, getPropertiesFromMysql(databaseName, tableName), "").copy();
+
+        return new CatalogTableImpl(schema, pList, getPropertiesFromMysql(databaseName, tableName), "").copy();
 
     }
 
