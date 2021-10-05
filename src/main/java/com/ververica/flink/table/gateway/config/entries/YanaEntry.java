@@ -28,10 +28,10 @@ public class YanaEntry extends ConfigEntry {
 
     @Override
     protected void validate(DescriptorProperties properties) {
-        properties.validateLong(defaultDatabase, false);
+        properties.validateString(defaultDatabase, false);
         properties.validateString(username, false);
-        properties.validateInt(pwd, false);
-        properties.validateInt(connectUrl, false);
+        properties.validateString(pwd, false);
+        properties.validateString(connectUrl, false);
     }
 
     public String getDefaultDatabase() {
