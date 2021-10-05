@@ -68,7 +68,7 @@ public class Environment {
 
     private DeploymentEntry deployment;
 
-    private YanaEntry yana;
+    //private YanaEntry yana;
 
     public Environment() {
         this.server = ServerEntry.DEFAULT_INSTANCE;
@@ -80,7 +80,7 @@ public class Environment {
         this.execution = ExecutionEntry.DEFAULT_INSTANCE;
         this.configuration = ConfigurationEntry.DEFAULT_INSTANCE;
         this.deployment = DeploymentEntry.DEFAULT_INSTANCE;
-        this.yana = YanaEntry.DEFAULT_INSTANCE;
+        //this.yana = YanaEntry.DEFAULT_INSTANCE;
     }
 
     public void setSession(Map<String, Object> config) {
@@ -187,13 +187,13 @@ public class Environment {
         return configuration;
     }
 
-    public void setYana(Map<String, Object> config) {
-        this.yana = YanaEntry.create(config);
-    }
-
-    public YanaEntry getYana() {
-        return yana;
-    }
+//    public void setYana(Map<String, Object> config) {
+//        this.yana = YanaEntry.create(config);
+//    }
+//
+//    public YanaEntry getYana() {
+//        return yana;
+//    }
 
     public void setDeployment(Map<String, Object> config) {
         this.deployment = DeploymentEntry.create(config);
@@ -237,7 +237,7 @@ public class Environment {
         sb.append("=================== Deployment ===================\n");
         deployment.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
         sb.append("=================== Yana ===================\n");
-        yana.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
+       // yana.asTopLevelMap().forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
         return sb.toString();
     }
 
