@@ -28,10 +28,11 @@ public class YanaEntry extends ConfigEntry {
 
     @Override
     protected void validate(DescriptorProperties properties) {
-        properties.validateString(defaultDatabase, false, 1);
-        properties.validateString(username, false, 1);
-        properties.validateString(pwd, false, 1);
-        properties.validateString(connectUrl, false, 1);
+        //todo
+//        properties.validateString(defaultDatabase, false, 1);
+//        properties.validateString(username, false, 1);
+//        properties.validateString(pwd, false, 1);
+//        properties.validateString(connectUrl, false, 1);
     }
 
     public String getDefaultDatabase() {
@@ -43,11 +44,11 @@ public class YanaEntry extends ConfigEntry {
     }
 
     public String getPwd() {
-        return properties.getOptionalString(pwd).orElseGet(() -> useDefaultValue(pwd, "root"));
+        return properties.getOptionalString(pwd).orElseGet(() -> useDefaultValue(pwd, "Password01!"));
     }
 
     public String getConnectUrl() {
-        return properties.getOptionalString(connectUrl).orElseGet(() -> useDefaultValue(connectUrl, "jdbc:mysql://localhost:3306/data-plat?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC"));
+        return properties.getOptionalString(connectUrl).orElseGet(() -> useDefaultValue(connectUrl, "jdbc:mysql://120.27.2.6:3306/data-plat?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC"));
     }
 
 
