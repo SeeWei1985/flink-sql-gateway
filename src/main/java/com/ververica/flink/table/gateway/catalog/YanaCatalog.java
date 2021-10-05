@@ -150,9 +150,10 @@ public class YanaCatalog extends AbstractCatalog {
         }
 
         //设置主键
-        if (pk != null && !"".equals(pk)) {
-            builder.primaryKey(pk.split(","));
-        }
+        // todo 读的时候 不考虑主键吧
+//        if (pk != null && !"".equals(pk)) {
+//            builder.primaryKey(pk.split(","));
+//        }
 
         //设置watermark
         if (watermarkExpression != null && !"".equals(watermarkExpression)) {
